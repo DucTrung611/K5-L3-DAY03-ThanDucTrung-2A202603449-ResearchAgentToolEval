@@ -310,6 +310,41 @@
         "difficulty": "hard",
         "what_it_tests": "3 turns: ban đầu thiếu nội dung văn bản, sau khi người dùng cung cấp text ở turn 2 → turn 3 gọi sentiment_analyzer với đúng nội dung được cung cấp."
       }
+    },
+    {
+      "id": "GRP_H04_multiturn_github_repo_url",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Kiểm tra giúp mình thông tin kho mã nguồn của thư viện requests"
+        },
+        {
+          "role": "user",
+          "content": "Link GitHub của nó đây: https://github.com/psf/requests"
+        },
+        {
+          "role": "user",
+          "content": "Lấy thông tin stars và mô tả của repo này nhé"
+        }
+      ],
+      "failure_type": "missing_info",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "github_repo",
+            "args": {
+              "repo": "psf/requests"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "multiturn_github_repo_url_extract",
+        "difficulty": "medium",
+        "what_it_tests": "3 turns: ban đầu chỉ nêu tên thư viện, lượt 2 cung cấp link đầy đủ -> lượt cuối trích xuất đúng owner/repo 'psf/requests' và gọi github_repo."
+      }
     }
   ]
 }

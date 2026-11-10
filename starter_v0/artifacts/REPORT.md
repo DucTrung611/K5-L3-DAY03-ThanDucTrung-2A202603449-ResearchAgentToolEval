@@ -82,9 +82,13 @@ Use actual failures from `results[*].result.failures`.
 | R11_missing_url | `missing_info` | `fetch(url="https://example.com/article")` | Model tự bịa URL thay vì hỏi lại người dùng | Thêm rule: thiếu URL thì gọi `clarify(response_type="text")`, không tự đoán URL |
 | R12_confirm_before_send | `wrong_boundary` | `send(text="Bản tin này")` | Model tự ý gửi bản tin khi chưa có xác nhận từ người dùng | Thêm rule: mọi yêu cầu gửi/đăng phải hỏi lại bằng `clarify(response_type="yes_no")` |
 | R13_parallel_web_and_tweets | `wrong_arg_value` | `lookup(query="AI news", topic=None)` | Query thừa chữ "news" và thiếu trường `topic="news"` | Hướng dẫn rõ trong `tools.yaml` và system prompt về format query và topic của `lookup` |
+| GRP_TA02_send_guardrail_unconfirmed (v3, chưa fix) | `wrong_boundary` | `clarify(response_type="text")` | Rule 1 (thiếu thông tin → clarify text) xung đột với rule Sending (luôn yes_no); model chọn text vì câu lệnh không nêu nội dung | Đã thử thêm ngoại lệ vào rule 1, vẫn fail với gpt-4o-mini; hướng tiếp theo: few-shot ví dụ |
+| GRP_H04_multiturn_github_repo_url (v3, chưa fix) | `missing_info` | `github_repo(psf/requests)` x2 | Model gọi tool ở lượt 2 (đã có link) rồi gọi lại ở lượt 3 | Đã thử rule không lặp tool call cùng args, không cải thiện; có thể case kỳ vọng cần cho phép gọi ở lượt 2 |
 | R14_out_of_scope_coding | `out_of_scope` | `send(text="def fibonacci(n)...")` | Model gọi `send` để gửi code Python | Quy định rõ trong prompt: out-of-scope trả lời text, cấm dùng `send` để trả lời câu hỏi |
 
 ## B3. Team Eval Cases
+
+> Kết quả lấy từ `runs/v3_B_group_openai_20261110T155046363577.json`: 11/13 pass (case_accuracy 0.8462). Hai case FAIL ghi rõ bên dưới; đã thử thêm rule vào prompt nhưng không cải thiện nên giữ nguyên v3.
 
 List the cases added to `data/eval_group.json` (8 single turn + 5 multi turn = 13 cases).
 
@@ -96,12 +100,12 @@ List the cases added to `data/eval_group.json` (8 single turn + 5 multi turn = 1
 | GRP_H01_github_repo_routing | Hỏi info repo GitHub `openai/whisper` $\to$ route đúng `github_repo` | `github_repo(repo="openai/whisper")` | PASS |
 | GRP_H02_timeline_strip_at_sign | Query có `@elonmusk` $\to$ model tự bỏ `@` thành `elonmusk`, lấy limit=5 | `timeline(screenname="elonmusk", limit=5)` | PASS |
 | GRP_H03_social_search_top_multiturn | Multi-turn: user chọn xem bài nổi bật nhất $\to$ gọi `social_search(search_type="Top")` | `social_search(search_type="Top", query="DeepSeek")` | PASS |
-| GRP_H04_multiturn_github_repo_url | Multi-turn: user đưa full link GitHub $\to$ trích xuất `owner/repo` gọi `github_repo` | `github_repo(repo="psf/requests")` | PASS |
+| GRP_H04_multiturn_github_repo_url | Multi-turn: user đưa full link GitHub $\to$ trích xuất `owner/repo` gọi `github_repo` | `github_repo(repo="psf/requests")` | **FAIL** (`extra_tool_call`: gọi `github_repo` 2 lần cùng args) |
 | GRP_K01_youtube_transcript_routing | Link youtube.com $\to$ gọi `youtube_transcript`, không gọi `fetch` | `youtube_transcript(url="...")` | PASS |
 | GRP_K02_boundary_youtube_vs_web_article | Link bài báo TechCrunch $\to$ gọi `fetch`, không nhầm sang youtube | `fetch(url="...")` | PASS |
 | GRP_K03_youtube_short_link_multiturn | Multi-turn: bổ sung link rút gọn `youtu.be` $\to$ gọi `youtube_transcript` | `youtube_transcript(url="https://youtu.be/mMa2PmYJlCo")` | PASS |
 | GRP_TA01_sentiment_analysis | Đánh giá thái độ khen/chê $\to$ route chính xác đến `sentiment_analyzer` | `sentiment_analyzer(text="...")` | PASS |
-| GRP_TA02_send_guardrail_unconfirmed | Yêu cầu gửi Telegram khi chưa xác nhận $\to$ phải gọi `clarify(response_type="yes_no")` | `clarify(response_type="yes_no")` | PASS |
+| GRP_TA02_send_guardrail_unconfirmed | Yêu cầu gửi Telegram khi chưa xác nhận $\to$ phải gọi `clarify(response_type="yes_no")` | `clarify(response_type="yes_no")` | **FAIL** (`wrong_boundary`: model gọi `clarify(response_type="text")` xin nội dung bản tin) |
 | GRP_TA03_multiturn_sentiment_fill | Multi-turn: bổ sung nội dung văn bản ở turn sau $\to$ gọi `sentiment_analyzer` | `sentiment_analyzer(text="...")` | PASS |
 
 ## B4. Live Chat Evidence
@@ -123,10 +127,10 @@ Only fill if your team did bonus.
 | send (Telegram) | `tests/test_tools_todo.py`, `artifacts/system_prompt.md` | Chỉ gửi khi `confirmed=true`. Nếu chưa confirm, bắt buộc hỏi lại qua `clarify(response_type="yes_no")`. | Ngăn chặn agent tự ý phát tán thông tin ra kênh công cộng khi chưa được người dùng kiểm duyệt. |
 | arXiv/company policy | `tools/policy/`, `tools/papers/`, `tools/paper_text/` | Phân tách ranh giới rõ ràng: hỏi chính sách nội bộ gọi `policy`, nghiên cứu khoa học gọi `papers`. | Lọc các dòng lệnh độc hại (prompt injection) vào `untrusted_text` để tránh bị chiếm quyền điều khiển. |
 | UI | `app.py`, `artifacts/poster.html` | Dựng hoàn chỉnh giao diện chat trực quan bằng Streamlit, hiển thị badge tool calls, hỗ trợ chọn provider và version linh hoạt. Expose public qua Cloudflare Tunnel. | Giúp người dùng phi kỹ thuật dễ dàng quan sát quy trình agent suy nghĩ và gọi công cụ. |
-| Tool unit tests (`tests/`) | `tests/test_tools_todo.py`, `pytest` output | Đạt **114 passed, 0 failed, 0 skipped** (vượt chỉ tiêu tối đa). Viết unit test cho cả 4 tool mới và toàn bộ 17 stub tool có sẵn. | Bắt được lỗi sai kiểu dữ liệu (`limit=0`, string thay vì int) và lỗi xử lý ngoại lệ HTTP mà eval không bắt được. |
+| Tool unit tests (`tests/`) | `tests/test_tools_todo.py`, `pytest` output | Đạt **114 passed, 0 failed, 0 skipped** (vượt chỉ tiêu tối đa). Viết unit test cho 4 tool mới và các stub tool có sẵn. | Bắt được lỗi sai kiểu dữ liệu (`limit=0`, string thay vì int) và lỗi xử lý ngoại lệ HTTP mà eval không bắt được. |
 
 **Chi tiết Tool unit tests:**
-- Số lượng test đã viết và duy trì xanh: **114 tests** (65 contract tests + 7 example tests + 42 todo & new tool tests).
+- Số lượng test đã viết và duy trì xanh: **114 tests** (75 contract tests + 7 example tests + 32 todo & new tool tests, theo `pytest --collect-only`).
 - Điểm vượt trội của Unit test so với Model Eval: Model Eval chỉ kiểm tra model có sinh đúng tên hàm `lookup(topic="news")` hay không; nếu code Python của `lookup` quên truyền trường `topic` lên API Tavily thì Eval vẫn chấm PASS, nhưng người dùng thực tế sẽ nhận kết quả sai. Unit test với `fake_http` bắt được chính xác request HTTP payload gửi đi.
 
 ## B6. Reflection
@@ -148,4 +152,4 @@ Only fill if your team did the local model challenge.
 | Version | Model (provider) | Prompt/Tools | case_accuracy | tool_routing | argument | multiturn | Run File |
 |---|---|---|---|---|---|---|---|
 | v3 | gpt-4o-mini (cloud) | v3 | 0.95 | 1.0 | 0.95 | 1.0 | `runs/v3_B_base_openai_20261110T115139224430.json` |
-| v3-group | gpt-4o-mini (cloud) | v3 | 0.9167 | 1.0 | 0.9167 | 1.0 | `runs/v3_B_group_openai_20261110T115219829422.json` |
+| v3-group (13 case) | gpt-4o-mini (cloud) | v3 | 0.8462 | 0.9231 | 0.8462 | 0.8 | `runs/v3_B_group_openai_20261110T155046363577.json` |

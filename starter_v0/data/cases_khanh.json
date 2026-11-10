@@ -1,0 +1,65 @@
+{
+  "dataset_id": "khanh_eval_cases",
+  "cases": [
+    {
+      "id": "GRP_K01_youtube_transcript_routing",
+      "phase": "B",
+      "query": "Tóm tắt video YouTube này giúp tôi: https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "youtube_transcript",
+            "args": {
+              "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Link youtube.com phải gọi youtube_transcript chứ không gọi fetch."
+      }
+    },
+    {
+      "id": "GRP_K02_boundary_youtube_vs_web_article",
+      "phase": "B",
+      "query": "Đọc nội dung bài phân tích tại https://techcrunch.com/2026/01/ai-agents",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "fetch",
+            "args": {
+              "url": "https://techcrunch.com/2026/01/ai-agents"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Link web tin tức bài báo thông thường phải gọi fetch, không được nhầm sang youtube_transcript."
+      }
+    },
+    {
+      "id": "GRP_K03_youtube_short_link_multiturn",
+      "phase": "B",
+      "turns": [
+        "Tôi vừa xem một video bài giảng về Attention Mechanism nhưng không kịp ghi chép.",
+        "Link video ngắn đây nhé: https://youtu.be/mMa2PmYJlCo"
+      ],
+      "failure_type": "missing_info",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "youtube_transcript",
+            "args": {
+              "url": "https://youtu.be/mMa2PmYJlCo"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Lượt đầu thiếu link thì clarify hỏi lại, lượt 2 user đưa link dạng rút gọn youtu.be thì gọi youtube_transcript."
+      }
+    }
+  ]
+}

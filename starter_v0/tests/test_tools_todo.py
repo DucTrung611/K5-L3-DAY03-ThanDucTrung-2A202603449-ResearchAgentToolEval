@@ -107,13 +107,44 @@ def test_lookup_without_timeframe_omits_time_range(monkeypatch, fake_http) -> No
 # ---------------- fetch ----------------
 
 def test_fetch_maps_firecrawl_response(monkeypatch, fake_http) -> None:
-    # Mock {"data": {"markdown": "...", "metadata": {"title": "T", "sourceURL": "https://..."}}}
-    # Assert title/url/source/summary in result["items"][0].
-    pytest.skip(TODO)
+    monkeypatch.setenv("FIRECRAWL_API_KEY", "fc-test-key")
+    fake_payload = {
+        "data": {
+            "markdown": "# Article Content\nHello world",
+            "metadata": {
+                "title": "Sample Article",
+                "sourceURL": "https://example.com/article"
+            }
+        }
+    }
+    calls = fake_http(FakeResponse(fake_payload))
+    result = TOOL_FUNCTIONS["fetch"](url="https://example.com/article")
+
+    assert calls[0]["url"] == "https://api.firecrawl.dev/v1/scrape"
+    assert calls[0]["json"]["url"] == "https://example.com/article"
+    assert result["tool"] == "read_url"
+    assert len(result["items"]) == 1
+    item = result["items"][0]
+    assert item["title"] == "Sample Article"
+    assert item["url"] == "https://example.com/article"
+    assert item["source"] == "example.com"
+    assert item["summary"] == "# Article Content\nHello world"
 
 
 def test_fetch_truncates_markdown_to_4000_chars(monkeypatch, fake_http) -> None:
-    pytest.skip(TODO)
+    monkeypatch.setenv("FIRECRAWL_API_KEY", "fc-test-key")
+    long_markdown = "A" * 6000
+    fake_payload = {
+        "data": {
+            "markdown": long_markdown,
+            "metadata": {"title": "Long Post", "sourceURL": "https://example.com/long"}
+        }
+    }
+    fake_http(FakeResponse(fake_payload))
+    result = TOOL_FUNCTIONS["fetch"](url="https://example.com/long")
+
+    assert len(result["items"][0]["summary"]) == 4000
+    assert result["items"][0]["summary"] == "A" * 4000
 
 
 # ---------------- timeline / social_search ----------------
@@ -157,18 +188,28 @@ def test_social_search_passes_search_type(monkeypatch, fake_http) -> None:
 # ---------------- policy (local knowledge + trust boundary) ----------------
 
 def test_policy_empty_query_returns_no_results() -> None:
-    pytest.skip(TODO)
+    result = TOOL_FUNCTIONS["policy"](query="")
+    assert result["tool"] == "search_company_policy"
+    assert result["results"] == []
 
 
 def test_policy_area_filter_only_returns_that_area() -> None:
-    # policy_area="data_privacy" -> every result has policy_area == "data_privacy".
-    pytest.skip(TODO)
+    result = TOOL_FUNCTIONS["policy"](query="retention personal data", policy_area="data_privacy")
+    assert result["policy_area"] == "data_privacy"
+    assert len(result["results"]) > 0
+    for hit in result["results"]:
+        assert hit["policy_area"] == "data_privacy"
 
 
 def test_policy_instruction_like_lines_go_to_untrusted_text() -> None:
     # One policy file contains a quoted line that tries to give the assistant orders.
     # Query that section (source_citation) and assert: that line is in untrusted_text, NOT in facts.
-    pytest.skip(TODO)
+    result = TOOL_FUNCTIONS["policy"](query="Injection probe", policy_area="source_citation")
+    assert len(result["results"]) > 0
+    hit = result["results"][0]
+    assert hit["section"] == "Injection probe"
+    assert any("ignore" in u.lower() for u in hit["untrusted_text"])
+    assert "ignore" not in hit["facts"]
 
 
 # ---------------- YOUR NEW TOOL(S) ----------------
@@ -268,3 +309,33 @@ def test_sentiment_negative_and_neutral_return_ok_dict() -> None:
     assert neutral["status"] == "ok"
     assert neutral["sentiment"] == "neutral"
     assert neutral["score"] == 0.0
+
+
+# ---------------- youtube_transcript ----------------
+
+def test_youtube_transcript_happy_path(monkeypatch, fake_http) -> None:
+    fake_http(FakeResponse({
+        "title": "Machine Learning Explained",
+        "transcript": "Welcome to this machine learning introductory video."
+    }))
+    result = TOOL_FUNCTIONS["youtube_transcript"](url="https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+
+    assert result["tool"] == "youtube_transcript"
+    assert result["video_id"] == "dQw4w9WgXcQ"
+    assert result["title"] == "Machine Learning Explained"
+    assert "machine learning introductory video" in result["transcript"]
+    assert len(result["items"]) == 1
+
+
+def test_youtube_transcript_bad_url_returns_error_dict() -> None:
+    result = TOOL_FUNCTIONS["youtube_transcript"](url="https://notyoutube.com/article")
+    assert result["tool"] == "youtube_transcript"
+    assert result["error"] == "ValueError"
+    assert "Could not extract video ID" in result["message"]
+
+
+def test_youtube_transcript_http_error_returns_error_dict(monkeypatch, fake_http) -> None:
+    fake_http(FakeResponse(status_code=404))
+    result = TOOL_FUNCTIONS["youtube_transcript"](url="https://youtu.be/dQw4w9WgXcQ")
+    assert result["tool"] == "youtube_transcript"
+    assert result["error"] == "HTTPError"

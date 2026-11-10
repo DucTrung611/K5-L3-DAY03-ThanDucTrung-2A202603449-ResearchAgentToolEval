@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-
+from .youtube_transcript.tool import get_youtube_transcript
 # Folder names are intentionally vague to match the tool names students see.
 # The imported function names are the underlying implementations (unchanged).
 from .clarify.tool import ask_user
@@ -38,6 +38,7 @@ TOOL_FUNCTIONS = {
     "policy": search_company_policy,
     "papers": arxiv_search,
     "paper_text": get_arxiv_paper_text,
+    "youtube_transcript": get_youtube_transcript,
     "github_repo": get_github_repo,
     "calculator": calculate,
     "sentiment_analyzer": analyze_sentiment,

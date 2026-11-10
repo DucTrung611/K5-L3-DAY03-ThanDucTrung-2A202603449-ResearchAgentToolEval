@@ -16,6 +16,7 @@ from .format.tool import render_digest
 from .policy.tool import search_company_policy
 from .social_search.tool import search_tweets
 from .send.tool import send_telegram
+from .sentiment_analyzer.tool import analyze_sentiment
 from .lookup.tool import web_search
 from .github_repo.tool import get_github_repo
 from .calculator.tool import calculate
@@ -39,6 +40,7 @@ TOOL_FUNCTIONS = {
     "paper_text": get_arxiv_paper_text,
     "github_repo": get_github_repo,
     "calculator": calculate,
+    "sentiment_analyzer": analyze_sentiment,
     # TODO(student): register your new tool here, e.g. "my_tool": my_tool_function,
     # then declare it in artifacts/tools.yaml and run `pytest tests/test_tool_contract.py`.
 }

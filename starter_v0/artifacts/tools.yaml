@@ -140,3 +140,11 @@ tools:
         expression: {type: string, description: "Biểu thức thuần số, ví dụ '1200*1.08**5' hoặc 'avg(3,5,9)'. Không chứa chữ/đơn vị."}
         precision: {type: integer, default: 6, description: "Số chữ số thập phân (0-15)"}
       required: [expression]
+
+  - name: sentiment_analyzer
+    description: "Phân tích sắc thái cảm xúc (positive, negative, neutral) và mức độ đánh giá khen/chê của một bài viết, tweet hoặc đoạn văn bản. Dùng khi người dùng yêu cầu đánh giá thái độ dư luận hoặc đo lường sentiment. KHÔNG dùng để tra cứu sự kiện hay tóm tắt bài báo."
+    parameters:
+      type: object
+      properties:
+        text: {type: string, default: "", description: "Nội dung đoạn văn bản hoặc bài đăng cần phân tích cảm xúc."}
+      required: [text]

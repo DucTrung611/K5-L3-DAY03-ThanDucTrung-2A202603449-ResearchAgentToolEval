@@ -1,0 +1,49 @@
+{
+  "dataset_id": "cases_trung",
+  "dataset_role": "group",
+  "description": "Case cua DucTrung: calculator + ranh gioi voi lookup. Se copy vao mang cases cua eval_group.json khi merge.",
+  "cases": [
+    {
+      "id": "GRP_01_calc_compound_interest",
+      "phase": "B",
+      "suite": "group",
+      "query": "Gửi tiết kiệm 1200 USD với lãi 8%/năm, lãi kép, sau 5 năm được bao nhiêu tiền?",
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "calculator", "args": {}}]},
+      "metadata": {
+        "skill": "routing_calculator",
+        "difficulty": "easy",
+        "what_it_tests": "Câu hỏi cần ra một con số -> phải gọi calculator, không tự nhẩm và không gọi lookup."
+      }
+    },
+    {
+      "id": "GRP_02_price_lookup_not_calc",
+      "phase": "B",
+      "suite": "group",
+      "query": "Giá Bitcoin hôm nay đang là bao nhiêu?",
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "lookup", "args": {}}]},
+      "metadata": {
+        "skill": "boundary_lookup_vs_calculator",
+        "difficulty": "medium",
+        "what_it_tests": "Có chữ 'bao nhiêu' nhưng là dữ liệu thời gian thực trên web -> lookup, KHÔNG phải calculator."
+      }
+    },
+    {
+      "id": "GRP_03_calc_precision_carryover",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {"role": "user", "content": "Tính trung bình của 12, 15, 18 và 22 giúp mình"},
+        {"role": "user", "content": "Làm tròn đến 1 chữ số thập phân nhé"}
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {"tool_calls": [{"name": "calculator", "args": {"precision": 1}}]},
+      "metadata": {
+        "skill": "multiturn_calculator_precision",
+        "difficulty": "hard",
+        "what_it_tests": "2 turns: lượt 2 bổ sung yêu cầu làm tròn -> calculator với precision=1."
+      }
+    }
+  ]
+}

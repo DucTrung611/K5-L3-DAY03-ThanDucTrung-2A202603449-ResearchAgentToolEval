@@ -26,22 +26,22 @@ tools:
       required: [question]
 
   - name: timeline
-    description: "Lấy các bài đăng gần đây."
+    description: "Lấy các bài đăng gần đây (tweets) của một tài khoản Twitter/X cụ thể. Dùng khi người dùng muốn xem bài đăng của một người hoặc tổ chức cụ thể (ví dụ: Sam Altman -> screenname='sama', Elon Musk -> screenname='elonmusk'). KHÔNG dùng khi tìm kiếm bài đăng theo chủ đề hay từ khóa chung."
     parameters:
       type: object
       properties:
-        screenname: {type: string, default: "", description: "Tên tài khoản"}
-        limit: {type: integer, default: 5, description: "Số lượng"}
+        screenname: {type: string, default: "", description: "Tên tài khoản Twitter/X KHÔNG chứa tiền tố '@' (ví dụ: 'sama', 'elonmusk'). Tự động lược bỏ ký tự '@' nếu người dùng cung cấp."}
+        limit: {type: integer, default: 5, description: "Số lượng bài đăng cần lấy (mặc định 5)."}
       required: [screenname]
 
   - name: social_search
-    description: "Tìm trên mạng xã hội."
+    description: "Tìm kiếm các bài đăng trên mạng xã hội Twitter/X theo từ khóa hoặc chủ đề. Dùng khi người dùng hỏi mọi người đang bàn luận gì về một chủ đề (ví dụ: 'Mọi người bàn gì về GPT-5 trên Twitter?'). KHÔNG dùng khi lấy bài đăng của một tài khoản cá nhân cụ thể."
     parameters:
       type: object
       properties:
-        query: {type: string, default: "", description: "Từ khóa"}
-        search_type: {type: string, enum: [Latest, Top], default: "Latest", description: "Cách sắp xếp"}
-        limit: {type: integer, default: 5, description: "Số lượng"}
+        query: {type: string, default: "", description: "Từ khóa hoặc chủ đề tìm kiếm trên Twitter/X."}
+        search_type: {type: string, enum: [Latest, Top], default: "Latest", description: "Cách sắp xếp: 'Latest' cho tin bài mới nhất, 'Top' cho bài đăng nổi bật/phổ biến nhất."}
+        limit: {type: integer, default: 5, description: "Số lượng kết quả cần lấy (mặc định 5)."}
       required: [query]
 
   - name: lookup
@@ -123,3 +123,11 @@ tools:
         max_pages: {type: integer, default: 5, description: "Số trang"}
         max_chars: {type: integer, default: 8000, description: "Số ký tự"}
       required: [arxiv_url]
+
+  - name: github_repo
+    description: "Tra cứu thông tin chi tiết một kho lưu trữ (repository) trên GitHub như số sao (stars), forks, ngôn ngữ, mô tả, số issues. Dùng khi người dùng hỏi về dự án, repo, thư viện mã nguồn mở trên GitHub. Không dùng để tìm kiếm tweet hay bài báo khoa học."
+    parameters:
+      type: object
+      properties:
+        repo: {type: string, default: "", description: "Tên repository theo dạng 'owner/repo' (ví dụ: openai/whisper, psf/requests) hoặc link GitHub"}
+      required: [repo]

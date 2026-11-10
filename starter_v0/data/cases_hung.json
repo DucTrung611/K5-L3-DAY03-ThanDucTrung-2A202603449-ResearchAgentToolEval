@@ -1,0 +1,86 @@
+{
+  "author": "Trần Mạnh Hùng (gitchung-mmm)",
+  "cases": [
+    {
+      "id": "GRP_H01_github_repo_routing",
+      "phase": "B",
+      "suite": "group",
+      "query": "Cho mình biết repo openai/whisper trên GitHub có bao nhiêu stars và viết bằng ngôn ngữ gì?",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "github_repo",
+            "args": {
+              "repo": "openai/whisper"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "routing_github_repo",
+        "difficulty": "easy",
+        "what_it_tests": "Hỏi thông tin repo GitHub -> route chính xác tới tool github_repo với repo='openai/whisper', không gọi lookup hay fetch."
+      }
+    },
+    {
+      "id": "GRP_H02_timeline_strip_at_sign",
+      "phase": "B",
+      "suite": "group",
+      "query": "Lấy 5 bài đăng mới nhất của @elonmusk trên Twitter",
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "elonmusk",
+              "limit": 5
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "arg_screenname_strip_at",
+        "difficulty": "medium",
+        "what_it_tests": "Người dùng truyền '@elonmusk' -> model phải tự động lược bỏ tiền tố '@' thành 'elonmusk' và lấy đúng limit=5."
+      }
+    },
+    {
+      "id": "GRP_H03_social_search_top_multiturn",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Mọi người đang bàn gì về DeepSeek trên mạng xã hội?"
+        },
+        {
+          "role": "assistant",
+          "content": "Bạn muốn xem các bài đăng mới nhất (Latest) hay các bài nổi bật nhất (Top)?"
+        },
+        {
+          "role": "user",
+          "content": "Lấy cho mình những bài đăng nổi bật nhất nhé"
+        }
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "query": "DeepSeek",
+              "search_type": "Top"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "multiturn_social_search_type",
+        "difficulty": "medium",
+        "what_it_tests": "Hội thoại nhiều lượt: khi người dùng chọn 'nổi bật nhất' ở lượt tiếp theo -> gọi social_search với search_type='Top' và query='DeepSeek'."
+      }
+    }
+  ]
+}

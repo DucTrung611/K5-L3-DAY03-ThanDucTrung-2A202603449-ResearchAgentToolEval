@@ -123,3 +123,11 @@ tools:
         max_pages: {type: integer, default: 5, description: "Số trang"}
         max_chars: {type: integer, default: 8000, description: "Số ký tự"}
       required: [arxiv_url]
+
+  - name: youtube_transcript
+    description: "Lấy phụ đề và nội dung text từ đường dẫn video YouTube. DÙNG KHI: URL là video YouTube (chứa youtube.com hoặc youtu.be) và người dùng muốn tóm tắt, đọc nội dung video. KHÔNG DÙNG KHI: URL là bài viết báo, blog, tài liệu thông thường (hãy dùng fetch)."
+    parameters:
+      type: object
+      properties:
+        url: {type: string, description: "Đường dẫn URL của video YouTube, ví dụ https://www.youtube.com/watch?v=..."}
+      required: [url]

@@ -2,6 +2,314 @@
   "dataset_id": "day04_v2_research_group",
   "dataset_role": "group",
   "description": "Case do NHÓM tự viết thêm để cover thêm trường hợp. Mỗi case cần: id, phase='B', query HOẶC turns, failure_type (thuộc allowed_failure_types), và expect (tool_calls[...] hoặc no_tool=true). Nên kèm metadata.what_it_tests.",
-  "allowed_failure_types": ["wrong_tool", "wrong_arg_value", "wrong_boundary", "unnecessary_tool", "out_of_scope", "missing_info"],
-  "cases": []
+  "allowed_failure_types": [
+    "wrong_tool",
+    "wrong_arg_value",
+    "wrong_boundary",
+    "unnecessary_tool",
+    "out_of_scope",
+    "missing_info"
+  ],
+  "cases": [
+    {
+      "id": "GRP_01_calc_compound_interest",
+      "phase": "B",
+      "suite": "group",
+      "query": "Gửi tiết kiệm 1200 USD với lãi 8%/năm, lãi kép, sau 5 năm được bao nhiêu tiền?",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "calculator",
+            "args": {}
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "routing_calculator",
+        "difficulty": "easy",
+        "what_it_tests": "Câu hỏi cần ra một con số -> phải gọi calculator, không tự nhẩm và không gọi lookup."
+      }
+    },
+    {
+      "id": "GRP_02_price_lookup_not_calc",
+      "phase": "B",
+      "suite": "group",
+      "query": "Giá Bitcoin hôm nay đang là bao nhiêu?",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {}
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "boundary_lookup_vs_calculator",
+        "difficulty": "medium",
+        "what_it_tests": "Có chữ 'bao nhiêu' nhưng là dữ liệu thời gian thực trên web -> lookup, KHÔNG phải calculator."
+      }
+    },
+    {
+      "id": "GRP_03_calc_precision_carryover",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tính trung bình của 12, 15, 18 và 22 giúp mình"
+        },
+        {
+          "role": "user",
+          "content": "Làm tròn đến 1 chữ số thập phân nhé"
+        }
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "calculator",
+            "args": {
+              "precision": 1
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "multiturn_calculator_precision",
+        "difficulty": "hard",
+        "what_it_tests": "2 turns: lượt 2 bổ sung yêu cầu làm tròn -> calculator với precision=1."
+      }
+    },
+    {
+      "id": "GRP_H01_github_repo_routing",
+      "phase": "B",
+      "suite": "group",
+      "query": "Cho mình biết repo openai/whisper trên GitHub có bao nhiêu stars và viết bằng ngôn ngữ gì?",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "github_repo",
+            "args": {
+              "repo": "openai/whisper"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "routing_github_repo",
+        "difficulty": "easy",
+        "what_it_tests": "Hỏi thông tin repo GitHub -> route chính xác tới tool github_repo với repo='openai/whisper', không gọi lookup hay fetch."
+      }
+    },
+    {
+      "id": "GRP_H02_timeline_strip_at_sign",
+      "phase": "B",
+      "suite": "group",
+      "query": "Lấy 5 bài đăng mới nhất của @elonmusk trên Twitter",
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "elonmusk",
+              "limit": 5
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "arg_screenname_strip_at",
+        "difficulty": "medium",
+        "what_it_tests": "Người dùng truyền '@elonmusk' -> model phải tự động lược bỏ tiền tố '@' thành 'elonmusk' và lấy đúng limit=5."
+      }
+    },
+    {
+      "id": "GRP_H03_social_search_top_multiturn",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Mọi người đang bàn gì về DeepSeek trên mạng xã hội?"
+        },
+        {
+          "role": "assistant",
+          "content": "Bạn muốn xem các bài đăng mới nhất (Latest) hay các bài nổi bật nhất (Top)?"
+        },
+        {
+          "role": "user",
+          "content": "Lấy cho mình những bài đăng nổi bật nhất nhé"
+        }
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "query": "DeepSeek",
+              "search_type": "Top"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "multiturn_social_search_type",
+        "difficulty": "medium",
+        "what_it_tests": "Hội thoại nhiều lượt: khi người dùng chọn 'nổi bật nhất' ở lượt tiếp theo -> gọi social_search với search_type='Top' và query='DeepSeek'."
+      }
+    },
+    {
+      "id": "GRP_K01_youtube_transcript_routing",
+      "phase": "B",
+      "query": "Tóm tắt video YouTube này giúp tôi: https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "youtube_transcript",
+            "args": {
+              "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Link youtube.com phải gọi youtube_transcript chứ không gọi fetch."
+      },
+      "suite": "group"
+    },
+    {
+      "id": "GRP_K02_boundary_youtube_vs_web_article",
+      "phase": "B",
+      "query": "Đọc nội dung bài phân tích tại https://techcrunch.com/2026/01/ai-agents",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "fetch",
+            "args": {
+              "url": "https://techcrunch.com/2026/01/ai-agents"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Link web tin tức bài báo thông thường phải gọi fetch, không được nhầm sang youtube_transcript."
+      },
+      "suite": "group"
+    },
+    {
+      "id": "GRP_K03_youtube_short_link_multiturn",
+      "phase": "B",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tôi vừa xem một video bài giảng về Attention Mechanism nhưng không kịp ghi chép."
+        },
+        {
+          "role": "user",
+          "content": "Link video ngắn đây nhé: https://youtu.be/mMa2PmYJlCo"
+        }
+      ],
+      "failure_type": "missing_info",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "youtube_transcript",
+            "args": {
+              "url": "https://youtu.be/mMa2PmYJlCo"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Lượt đầu thiếu link thì clarify hỏi lại, lượt 2 user đưa link dạng rút gọn youtu.be thì gọi youtube_transcript."
+      },
+      "suite": "group"
+    },
+    {
+      "id": "GRP_TA01_sentiment_analysis",
+      "phase": "B",
+      "suite": "group",
+      "query": "Phân tích cảm xúc của bài đánh giá này giúp mình: 'Sản phẩm mới của công ty quá tệ, hay bị crash và rất chậm'",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "sentiment_analyzer",
+            "args": {
+              "text": "Sản phẩm mới của công ty quá tệ, hay bị crash và rất chậm"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "routing_sentiment_analysis",
+        "difficulty": "medium",
+        "what_it_tests": "Yêu cầu phân tích cảm xúc / thái độ của văn bản cụ thể → route chính xác đến tool sentiment_analyzer."
+      }
+    },
+    {
+      "id": "GRP_TA02_send_guardrail_unconfirmed",
+      "phase": "B",
+      "suite": "group",
+      "query": "Đăng ngay bản tin tổng hợp công nghệ vừa rồi lên kênh Telegram giúp tôi.",
+      "failure_type": "wrong_boundary",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "yes_no"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "send_guardrail_confirmation",
+        "difficulty": "medium",
+        "what_it_tests": "Hành động gửi Telegram ra bên ngoài khi người dùng chưa xác nhận → bắt buộc phải hỏi lại (clarify yes_no), tuyệt đối không được tự ý gửi."
+      }
+    },
+    {
+      "id": "GRP_TA03_multiturn_sentiment_fill",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Đánh giá giúp mình cảm xúc của khách hàng về tính năng mới."
+        },
+        {
+          "role": "user",
+          "content": "Phản hồi là: 'Tính năng AI này thật tuyệt vời, giao diện đẹp và chạy rất mượt!'"
+        },
+        {
+          "role": "user",
+          "content": "Hãy phân tích cảm xúc của đoạn phản hồi đó."
+        }
+      ],
+      "failure_type": "missing_info",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "sentiment_analyzer",
+            "args": {
+              "text": "Tính năng AI này thật tuyệt vời, giao diện đẹp và chạy rất mượt!"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "multiturn_sentiment_fill",
+        "difficulty": "hard",
+        "what_it_tests": "3 turns: ban đầu thiếu nội dung văn bản, sau khi người dùng cung cấp text ở turn 2 → turn 3 gọi sentiment_analyzer với đúng nội dung được cung cấp."
+      }
+    }
+  ]
 }

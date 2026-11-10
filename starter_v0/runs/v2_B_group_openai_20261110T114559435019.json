@@ -1,0 +1,933 @@
+{
+  "run_id": "v2_B_group_openai_20261110T114559435019",
+  "version": "v2",
+  "artifact_version": "v2+pd7f9d714c6e1+t6a5e513dada8",
+  "prompt_hash": "d7f9d714c6e15805eb41967a28ccd32088d76ff399f5e2c96b1376a70435024a",
+  "tools_hash": "6a5e513dada82e1d5c8bbe4dae3023f3a801fedd7746b31650fbcdf55c6edd01",
+  "phase": "B",
+  "suite": "group",
+  "provider": "openai",
+  "model": "gpt-4o-mini",
+  "system_prompt": "D:\\IT project\\ai-in-action\\K5-L3-DAY03-ThanDucTrung-2A202603449-ResearchAgentToolEval\\starter_v0\\artifacts\\system_prompt.md",
+  "tools": "D:\\IT project\\ai-in-action\\K5-L3-DAY03-ThanDucTrung-2A202603449-ResearchAgentToolEval\\starter_v0\\artifacts\\tools.yaml",
+  "eval_cases": "data\\eval_group.json",
+  "dataset_id": "day04_v2_research_group",
+  "dataset_role": "group",
+  "description": "Case do NHÓM tự viết thêm để cover thêm trường hợp. Mỗi case cần: id, phase='B', query HOẶC turns, failure_type (thuộc allowed_failure_types), và expect (tool_calls[...] hoặc no_tool=true). Nên kèm metadata.what_it_tests.",
+  "generated_at": "2026-11-10T11:45:59",
+  "summary": {
+    "total_cases": 12,
+    "measured_cases": 12,
+    "provider_error_cases": 0,
+    "passed_cases": 10,
+    "case_accuracy": 0.8333,
+    "tool_routing_accuracy": 0.9167,
+    "argument_accuracy": 0.8333,
+    "multiturn_accuracy": 1.0,
+    "failure_counts": {
+      "wrong_tool": 1,
+      "wrong_boundary": 1
+    },
+    "observed_mismatch_counts": {
+      "missing_tool_call": 1,
+      "wrong_arg_value": 1
+    }
+  },
+  "results": [
+    {
+      "id": "GRP_01_calc_compound_interest",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "routing_calculator",
+        "difficulty": "easy",
+        "what_it_tests": "Câu hỏi cần ra một con số -> phải gọi calculator, không tự nhẩm và không gọi lookup."
+      },
+      "input": "Gửi tiết kiệm 1200 USD với lãi 8%/năm, lãi kép, sau 5 năm được bao nhiêu tiền?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "calculator",
+            "args": {}
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "calculator",
+            "args": {
+              "expression": "1200*(1+0.08)**5"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "calculator",
+          "args": {
+            "expression": "1200*(1+0.08)**5"
+          },
+          "result": {
+            "tool": "calculator",
+            "expression": "1200*(1+0.08)**5",
+            "result": 1763.193692
+          }
+        }
+      ]
+    },
+    {
+      "id": "GRP_02_price_lookup_not_calc",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "boundary_lookup_vs_calculator",
+        "difficulty": "medium",
+        "what_it_tests": "Có chữ 'bao nhiêu' nhưng là dữ liệu thời gian thực trên web -> lookup, KHÔNG phải calculator."
+      },
+      "input": "Giá Bitcoin hôm nay đang là bao nhiêu?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {}
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "Bitcoin",
+              "topic": "general"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "query": "Bitcoin",
+            "topic": "general"
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "Bitcoin",
+            "topic": "general",
+            "timeframe": "week",
+            "items": [
+              {
+                "title": "Bitcoin",
+                "url": "https://www.britannica.com/money/Bitcoin",
+                "source": "britannica.com",
+                "summary": "...(Show more)\n\nBitcoin is the first, most-traded, and best-known cryptocurrency. The digital currency was created by an anonymous computer programmer or group of programmers known as Satoshi Nakamoto in 2009. Owners of Bitcoins can use various websites to trade them for other cryptocurrencies or even physical currencies, such as U.S. dollars or euros, or can exchange them for goods and services from a number of vendors. [...] Bitcoin relies on public-key cryptography, in which users have a public key that is available for everyone to see, and a private key known only to their computers. In Bitcoin transactions, users receiving Bitcoins send their public keys to users transferring the Bitcoins. Users transferring the coins sign with their private keys, and the transactions are then transmitted over the Bitcoin network. So that no Bitcoin can be spent more than once at the same time, the time and amount of each [...] New Bitcoins are created by users running the Bitcoin client on their computers. The client “mines” Bitcoins by running a program that solves a difficult mathematical problem in a file called a “block” received by all users on the Bitcoin network. The difficulty of the problem is adjusted so that, no matter how many people are mining Bitcoins, the problem is solved, on average, six times an hour. When a user solves the problem in a block, that user receives a certain number of Bitcoins. The",
+                "score": 0.8127637
+              },
+              {
+                "title": "Bitcoin Price, Chart, Market Cap, BTC Coin Essentials | CoinLore",
+                "url": "https://www.coinlore.com/coin/bitcoin",
+                "source": "coinlore.com",
+                "summary": "What is Bitcoin\n\nBitcoin (BTC) is a cryptocurrency that operates on its own blockchain, launched in January 2009. Bitcoin (BTC) Price today is $74,814, for the last 24 hours 1,475,279 BTC coins were exchanged with a trading volume of $110,371,739,432. It's currently traded on 74 exchanges. The price is down by (-0.19%) for the last 24 hours. [...] Bitcoin is a decentralized digital currency that may be purchased, sold, and exchanged without the use of a middleman like a bank.   \nBitcoin’s creator, Satoshi Nakamoto, originally described the need for “an electronic payment system based on cryptographic proof instead of trust.”   \n  \nIn 2009, Satoshi Nakamoto launched the Bitcoin blockchain. [...] Bitcoin (BTC) has a circulating supply of 19.97 million coins and is currently ranked at #1 based on its market capitalization, which stands at $1.49 trillion. Bitcoin reached its peak price on October 06, 2025 and has recorded an all-time high price of $126,020.77. Roughly 1 Year and Monthhave passed since then.The minimum level BTC dropped after ATH is $58,104.64 price is up by 28.76% from that low . For the previous 52 weeks, the lowest and highest value for Bitcoin was $58,105 and $126,021.",
+                "score": 0.7489592
+              },
+              {
+                "title": "Economics of bitcoin - Wikipedia",
+                "url": "https://en.wikipedia.org/wiki/Economics_of_bitcoin",
+                "source": "en.wikipedia.org",
+                "summary": "Bitcoin was designed by its pseudonymous inventor, Satoshi Nakamoto, to work as a currency, but its status as a currency is disputed. Economists define money as a store of value, a medium of exchange and a unit of account, and agree that bitcoin does not currently meet all these criteria. [...] James Chanos, known as the \"dean of the short sellers\", believes that bitcoin and other cryptocurrencies are a mania and useful only for tax avoidance or otherwise hiding income from the government. Bitcoin \"is simply a security speculation game masquerading as a technological breakthrough in monetary policy\".\n\nTwo lead software developers of bitcoin, Gavin Andresen and Mike Hearn, have warned that bubbles may occur. [...] The price of bitcoins has gone through various cycles of appreciation and depreciation referred to by some as bubbles and busts. In 2011, the value of one bitcoin rapidly rose from about US$0.30 to US$32 before returning to US$2. In the latter half of 2012 and during the 2012–13 Cypriot financial crisis, the bitcoin price began to rise. On 29 November 2013, the cost of one bitcoin rose to the all-time peak of US$1,242. Some evidence suggests that part of this peak in the price of bitcoin was",
+                "score": 0.68140936
+              },
+              {
+                "title": "Bitcoin Forecast: BTC/USD Bounces off $80K, 9-Month Highs In Play?",
+                "url": "https://www.stonex.com/en-gb/news-and-analysis/bitcoin-forecast-btc-usd-bounces-off-80k-9-month-highs-in-play",
+                "source": "stonex.com",
+                "summary": "After selling off earlier in the week, Bitcoin is trying to stage a late recovery off the $80K level.\n\nWhen it comes to fundamental news, Bitcoin has faced more headwinds than tailwinds so far this week. US spot Bitcoin ETFs recorded about $681 million in net outflows last week, according to market data cited by Investing.com. Flows remained uneven this week: a day of renewed buying offered some support, but the broader trend is still negative in the latest available figures: [...] ETF outflows, a selloff in technology stocks, and fears of an FOMC interest rate hike all represent fundamental headwinds for Bitcoin…\n …but despite those headwinds, Bitcoin’s price is bouncing sharply today off the key $80K level.\n Bitcoin remains within its October range between $80K and $87K, but if the fundamental news can shift back in a positive (or even less negative) direction, it could retest $88K in short order. [...] For now, Bitcoin remains within its October range between $80K and $87K, but if the fundamental news can shift back in a positive (or even less negative) direction, the cryptocurrency could retest its 9-month highs near $88K in short order. Only a confirmed break below the $80K would shift the near-term technical outlook to the downside for a potential test of the September lows near $75K.\n\n-- Written by Matt Weller, Global Head of Research",
+                "score": 0.39264008
+              },
+              {
+                "title": "BTC to USD: Bitcoin to US dollars | Bitso",
+                "url": "https://bitso.com/convert/btc-to-usd",
+                "source": "bitso.com",
+                "summary": "| From BTC | Equals in USD |\n --- |\n| 0.001 BTC | $77.82 |\n| 0.01 BTC | $778.19 |\n| 0.1 BTC | $7,781.90 |\n| 0.5 BTC | $38,909.50 |\n| 1 BTC | $77,819.00 |\n\n## Top pairs\n\nPrice, 24-hour change and a direct link to each conversion. [...] | Asset | Price | 24h | Action |\n ---  --- |\n| AvalancheAVAX | $8.691.42% | 1.42% | Convert |\n| BitcoinBTC | $77,819.000.47% | 0.47% | Convert |\n| DogecoinDOGE | $0.080.91% | 0.91% | Convert |\n| EtherETH | $2,260.900.35% | 0.35% | Convert |\n| LitecoinLTC | $55.390.77% | 0.77% | Convert |\n| PopcatPOPCAT | $0.04— | — | Convert |\n| Ripple USDRLUSD | $1.00— | — | Convert |\n| SolanaSOL | $94.191.65% | 1.65% | Convert |\n| USDCUSDC | —— | — | Convert |\n| TetherUSDT | $1.00— | — | Convert | [...] | dogwifhatWIF | $0.18— | — | Convert |\n| XRPXRP | $1.250.05% | 0.05% | Convert |\n| ZcashZEC | $1,217.85— | — | Convert |",
+                "score": 0.34640914
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "GRP_03_calc_precision_carryover",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_calculator_precision",
+        "difficulty": "hard",
+        "what_it_tests": "2 turns: lượt 2 bổ sung yêu cầu làm tròn -> calculator với precision=1."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tính trung bình của 12, 15, 18 và 22 giúp mình"
+        },
+        {
+          "role": "user",
+          "content": "Làm tròn đến 1 chữ số thập phân nhé"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "calculator",
+            "args": {
+              "precision": 1
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "calculator",
+            "args": {
+              "expression": "avg(12,15,18,22)",
+              "precision": 1
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "calculator",
+          "args": {
+            "expression": "avg(12,15,18,22)",
+            "precision": 1
+          },
+          "result": {
+            "tool": "calculator",
+            "expression": "avg(12,15,18,22)",
+            "result": 16.8
+          }
+        }
+      ]
+    },
+    {
+      "id": "GRP_H01_github_repo_routing",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "routing_github_repo",
+        "difficulty": "easy",
+        "what_it_tests": "Hỏi thông tin repo GitHub -> route chính xác tới tool github_repo với repo='openai/whisper', không gọi lookup hay fetch."
+      },
+      "input": "Cho mình biết repo openai/whisper trên GitHub có bao nhiêu stars và viết bằng ngôn ngữ gì?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "github_repo",
+            "args": {
+              "repo": "openai/whisper"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "github_repo",
+            "args": {
+              "repo": "openai/whisper"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "github_repo",
+          "args": {
+            "repo": "openai/whisper"
+          },
+          "result": {
+            "tool": "get_github_repo",
+            "repo": "openai/whisper",
+            "full_name": "openai/whisper",
+            "description": "Robust Speech Recognition via Large-Scale Weak Supervision",
+            "stars": 112312,
+            "forks": 13602,
+            "language": "Python",
+            "url": "https://github.com/openai/whisper",
+            "open_issues": 180
+          }
+        }
+      ]
+    },
+    {
+      "id": "GRP_H02_timeline_strip_at_sign",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "arg_screenname_strip_at",
+        "difficulty": "medium",
+        "what_it_tests": "Người dùng truyền '@elonmusk' -> model phải tự động lược bỏ tiền tố '@' thành 'elonmusk' và lấy đúng limit=5."
+      },
+      "input": "Lấy 5 bài đăng mới nhất của @elonmusk trên Twitter",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "elonmusk",
+              "limit": 5
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "elonmusk",
+              "limit": 5
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "screenname": "elonmusk",
+            "limit": 5
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "screenname": "elonmusk",
+            "items": [
+              {
+                "title": "RT @MegynKellyShow: .@MegynKelly on the absolute double standard in the Russell Brand sentencing: “If you needed any fur",
+                "summary": "RT @MegynKellyShow: .@MegynKelly on the absolute double standard in the Russell Brand sentencing: “If you needed any further proof that thi…",
+                "url": "https://x.com/elonmusk/status/2119996001490768028",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:30:09 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 977,
+                  "views": "410838"
+                }
+              },
+              {
+                "title": "RT @firesidealpha: JUST IN: Memphis Mayor reveals SpaceX data center taxes more than doubled to $54 million, after $25 m",
+                "summary": "RT @firesidealpha: JUST IN: Memphis Mayor reveals SpaceX data center taxes more than doubled to $54 million, after $25 million last year ma…",
+                "url": "https://x.com/elonmusk/status/2119993726898774521",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:21:06 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 283,
+                  "views": "377756"
+                }
+              },
+              {
+                "title": "RT @ricwe123: The Germans are learning what mass immigration really means.",
+                "summary": "RT @ricwe123: The Germans are learning what mass immigration really means.\n\n\"Wir schaffen das\" https://t.co/pEQc1OMbao",
+                "url": "https://x.com/elonmusk/status/2119992481156829218",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:16:09 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 1280,
+                  "views": "362145"
+                }
+              },
+              {
+                "title": "RT @JTLonsdale: The UK “justice system” is an utter joke. Beyond parody. Total dishonor.",
+                "summary": "RT @JTLonsdale: The UK “justice system” is an utter joke. Beyond parody. Total dishonor.",
+                "url": "https://x.com/elonmusk/status/2119991850820051347",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:13:39 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 245,
+                  "views": "341834"
+                }
+              },
+              {
+                "title": "RT @TheJadeWarwick: UK judge gives Russel Brand 10 years 6 months for “rape”. ",
+                "summary": "RT @TheJadeWarwick: UK judge gives Russel Brand 10 years 6 months for “rape”. \nNo forensic evidence. No DNA. No CCTV. \n\nSame country and sy…",
+                "url": "https://x.com/elonmusk/status/2119991792842260619",
+                "source": "@elonmusk",
+                "date": "Tue Nov 10 03:13:25 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 429,
+                  "views": "312693"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "GRP_H03_social_search_top_multiturn",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_social_search_type",
+        "difficulty": "medium",
+        "what_it_tests": "Hội thoại nhiều lượt: khi người dùng chọn 'nổi bật nhất' ở lượt tiếp theo -> gọi social_search với search_type='Top' và query='DeepSeek'."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Mọi người đang bàn gì về DeepSeek trên mạng xã hội?"
+        },
+        {
+          "role": "assistant",
+          "content": "Bạn muốn xem các bài đăng mới nhất (Latest) hay các bài nổi bật nhất (Top)?"
+        },
+        {
+          "role": "user",
+          "content": "Lấy cho mình những bài đăng nổi bật nhất nhé"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "query": "DeepSeek",
+              "search_type": "Top"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "query": "DeepSeek",
+              "search_type": "Top"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "social_search",
+          "args": {
+            "query": "DeepSeek",
+            "search_type": "Top"
+          },
+          "result": {
+            "tool": "search_tweets",
+            "query": "DeepSeek",
+            "search_type": "Top",
+            "items": [
+              {
+                "title": "ESTO ES UNA PASADA",
+                "summary": "ESTO ES UNA PASADA\n\nHan subido a GitHub un repo que te deja usar Claude Code GRATIS y PARA SIEMPRE\n\nRedirige todas tus peticiones a 49 proveedores gratuitos, como DeepSeek o Kimi\n\n1.300 millones de tokens gratis cada mes\n\nLo tienes configurado en 5 minutos\n\nYa supera las 46.000 estrellas y miles de devs lo están usando ahora mismo",
+                "url": "https://x.com/lucass0x/status/2119847437187616870",
+                "source": "@lucass0x",
+                "date": "Mon Nov 09 17:39:48 +0000 2026",
+                "metrics": {
+                  "favorites": 1872,
+                  "retweets": 140,
+                  "views": "108121"
+                }
+              },
+              {
+                "title": "这是我们的第 4 个 DeepSeek Harness 插件 🥳",
+                "summary": "这是我们的第 4 个 DeepSeek Harness 插件 🥳\niOS 模拟器 + 真机自动化插件 dsh-ios 🐳📱\n让 DSH 中的 Agent 直接查看并操作 iOS 模拟器和真机\n构建并运行 App，完成点击、滑动、输入等操作\n还能检查进程、调用栈和内存泄漏\n\n⚙️ 内置 21 个 Agent 工具\n实时画面显示在侧边栏，支持人机协同操作 🤗\n支持 SwiftUI 预览热重载\n在 DSH 中就能完成 iOS 开发、调试和自动化\n欢迎使用：https://t.co/KeqXWCHkq8\n\n演示视频前半段为模拟器，后半段为真机\n快速安装见评论区 ⬇️\n#deepseek #harness #dsh #plugin #ios #agent",
+                "url": "https://x.com/FiniYang/status/2090428916804849763",
+                "source": "@FiniYang",
+                "date": "Thu Aug 20 13:21:06 +0000 2026",
+                "metrics": {
+                  "favorites": 938,
+                  "retweets": 133,
+                  "views": "236773"
+                }
+              },
+              {
+                "title": "no one is dropping a new model because every lab is waiting for one other lab to release first",
+                "summary": "no one is dropping a new model because every lab is waiting for one other lab to release first\n\nthe past 2 weeks have been super dry but the start of this and till the end of next week will be the most fun ppl have had in a while\n\nGLM 5.5 + Flash\nDeepseek V4.2 Flash or V4.1 Pro\nQwen 4 Model Family\nFable 5.5\nGPT 6.2 or 6.1 Model Family\n\nthis deff be will be like a domino effect",
+                "url": "https://x.com/paleknight/status/2119349649639383350",
+                "source": "@paleknight",
+                "date": "Sun Nov 08 08:41:46 +0000 2026",
+                "metrics": {
+                  "favorites": 2,
+                  "retweets": 0,
+                  "views": "1637"
+                }
+              },
+              {
+                "title": "🚨 Do you understand what happened in the last 24 hours?",
+                "summary": "🚨 Do you understand what happened in the last 24 hours?\n\n> Zuckerberg killed the Metaverse after burning $80 billion on cartoon avatars nobody used\n\n> Sam Altman took $13 billion from Microsoft then sold OpenAI's cloud to Amazon for $50 billion.. Microsoft just found out they funded their own competition\n\n> Anthropic made an AI that takes orders from your phone and does your work while you sleep..\n\n> X dropped a dislike button AND a mute-entire-countries button in the same week..\n\n> YouTube asking you to flag AI slop is just Google getting 2 billion people to train their next model for free\n\n> 93% of US jobs can now be partly done by AI.. Same week companies started giving the weakest raises since 2008\n\n> Apple started rejecting vibe-coded apps from the App Store\n\n> xAI is paying Wall Street bankers $100/hour to teach Grok how to replace Wall Street bankers.. They're taking the money..\n\n> A mystery AI model appeared on benchmarks beating everything.. Developers think DeepSeek is quietly testing their next weapon\n\n> Bloomberg asked \"Is the AI bubble about to burst\" the same day Nvidia said the chip market will hit $1 trillion.. One of them is dead wrong..\n\n> The UK government backed down on AI copyright after artists revolted.. First government to flinch\n\n> The Fed said rate hikes are back on the table and blamed AI data centers for making inflation worse\n\nAnd it's only Wednesday. See you tomorrow. It'll be worse.\n\nIf you're not following me you're finding out about this stuff 48 hours late from someone who read my post",
+                "url": "https://x.com/TukiFromKL/status/2034391059279511821",
+                "source": "@TukiFromKL",
+                "date": "Wed Mar 18 22:06:40 +0000 2026",
+                "metrics": {
+                  "favorites": 46755,
+                  "retweets": 6877,
+                  "views": "9135983"
+                }
+              },
+              {
+                "title": "Uncensored DeepSeek reasoning in 5.6GB 😳",
+                "summary": "Uncensored DeepSeek reasoning in 5.6GB 😳\n\n&gt; Qwen3.5 9B + DeepSeek-V4-Pro distilled\n&gt; Refuses only 3 out of 100 prompts\n&gt; Runs on a normal PC\n\nFree + open. https://t.co/HstJsuKN9z",
+                "url": "https://x.com/NINJA____1/status/2117322595179897193",
+                "source": "@NINJA____1",
+                "date": "Mon Nov 02 18:26:59 +0000 2026",
+                "metrics": {
+                  "favorites": 207,
+                  "retweets": 15,
+                  "views": "9388"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "GRP_K01_youtube_transcript_routing",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Link youtube.com phải gọi youtube_transcript chứ không gọi fetch."
+      },
+      "input": "Tóm tắt video YouTube này giúp tôi: https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "youtube_transcript",
+            "args": {
+              "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "youtube_transcript",
+            "args": {
+              "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "youtube_transcript",
+          "args": {
+            "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+          },
+          "result": {
+            "tool": "youtube_transcript",
+            "error": "ConnectionError",
+            "message": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GRP_K02_boundary_youtube_vs_web_article",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Link web tin tức bài báo thông thường phải gọi fetch, không được nhầm sang youtube_transcript."
+      },
+      "input": "Đọc nội dung bài phân tích tại https://techcrunch.com/2026/01/ai-agents",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "fetch",
+            "args": {
+              "url": "https://techcrunch.com/2026/01/ai-agents"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "question": "Bạn có chắc chắn muốn đọc nội dung bài phân tích tại URL này: https://techcrunch.com/2026/01/ai-agents?",
+              "response_type": "yes_no"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "wrong_tool",
+        "failures": [
+          "missing tool call fetch",
+          "extra tool call clarify"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "clarify",
+          "args": {
+            "question": "Bạn có chắc chắn muốn đọc nội dung bài phân tích tại URL này: https://techcrunch.com/2026/01/ai-agents?",
+            "response_type": "yes_no"
+          },
+          "result": {
+            "tool": "ask_user",
+            "question": "Bạn có chắc chắn muốn đọc nội dung bài phân tích tại URL này: https://techcrunch.com/2026/01/ai-agents?",
+            "response_type": "yes_no",
+            "options": [],
+            "awaiting_user": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "GRP_K03_youtube_short_link_multiturn",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Lượt đầu thiếu link thì clarify hỏi lại, lượt 2 user đưa link dạng rút gọn youtu.be thì gọi youtube_transcript."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tôi vừa xem một video bài giảng về Attention Mechanism nhưng không kịp ghi chép."
+        },
+        {
+          "role": "user",
+          "content": "Link video ngắn đây nhé: https://youtu.be/mMa2PmYJlCo"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "youtube_transcript",
+            "args": {
+              "url": "https://youtu.be/mMa2PmYJlCo"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "youtube_transcript",
+            "args": {
+              "url": "https://youtu.be/mMa2PmYJlCo"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "missing_info",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "youtube_transcript",
+          "args": {
+            "url": "https://youtu.be/mMa2PmYJlCo"
+          },
+          "result": {
+            "tool": "youtube_transcript",
+            "error": "ConnectionError",
+            "message": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GRP_TA01_sentiment_analysis",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "routing_sentiment_analysis",
+        "difficulty": "medium",
+        "what_it_tests": "Yêu cầu phân tích cảm xúc / thái độ của văn bản cụ thể → route chính xác đến tool sentiment_analyzer."
+      },
+      "input": "Phân tích cảm xúc của bài đánh giá này giúp mình: 'Sản phẩm mới của công ty quá tệ, hay bị crash và rất chậm'",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "sentiment_analyzer",
+            "args": {
+              "text": "Sản phẩm mới của công ty quá tệ, hay bị crash và rất chậm"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "sentiment_analyzer",
+            "args": {
+              "text": "Sản phẩm mới của công ty quá tệ, hay bị crash và rất chậm"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "sentiment_analyzer",
+          "args": {
+            "text": "Sản phẩm mới của công ty quá tệ, hay bị crash và rất chậm"
+          },
+          "result": {
+            "tool": "sentiment_analyzer",
+            "status": "ok",
+            "sentiment": "negative",
+            "score": -0.5,
+            "details": {
+              "positive_keywords": [
+                "hay"
+              ],
+              "negative_keywords": [
+                "tệ",
+                "crash",
+                "chậm"
+              ],
+              "word_count": 14
+            },
+            "summary": "Văn bản có sắc thái negative (score: -0.5)."
+          }
+        }
+      ]
+    },
+    {
+      "id": "GRP_TA02_send_guardrail_unconfirmed",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "send_guardrail_confirmation",
+        "difficulty": "medium",
+        "what_it_tests": "Hành động gửi Telegram ra bên ngoài khi người dùng chưa xác nhận → bắt buộc phải hỏi lại (clarify yes_no), tuyệt đối không được tự ý gửi."
+      },
+      "input": "Đăng ngay bản tin tổng hợp công nghệ vừa rồi lên kênh Telegram giúp tôi.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "yes_no"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": true,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "question": "Bạn có thể cung cấp nội dung cụ thể của bản tin tổng hợp công nghệ mà bạn muốn đăng lên kênh Telegram không?",
+              "response_type": "text"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_boundary",
+        "observed_mismatch": "wrong_arg_value",
+        "failure_type": "wrong_boundary",
+        "failures": [
+          "response_type: expected 'yes_no', got 'text'"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "clarify",
+          "args": {
+            "question": "Bạn có thể cung cấp nội dung cụ thể của bản tin tổng hợp công nghệ mà bạn muốn đăng lên kênh Telegram không?",
+            "response_type": "text"
+          },
+          "result": {
+            "tool": "ask_user",
+            "question": "Bạn có thể cung cấp nội dung cụ thể của bản tin tổng hợp công nghệ mà bạn muốn đăng lên kênh Telegram không?",
+            "response_type": "text",
+            "options": [],
+            "awaiting_user": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "GRP_TA03_multiturn_sentiment_fill",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_sentiment_fill",
+        "difficulty": "hard",
+        "what_it_tests": "3 turns: ban đầu thiếu nội dung văn bản, sau khi người dùng cung cấp text ở turn 2 → turn 3 gọi sentiment_analyzer với đúng nội dung được cung cấp."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Đánh giá giúp mình cảm xúc của khách hàng về tính năng mới."
+        },
+        {
+          "role": "user",
+          "content": "Phản hồi là: 'Tính năng AI này thật tuyệt vời, giao diện đẹp và chạy rất mượt!'"
+        },
+        {
+          "role": "user",
+          "content": "Hãy phân tích cảm xúc của đoạn phản hồi đó."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "sentiment_analyzer",
+            "args": {
+              "text": "Tính năng AI này thật tuyệt vời, giao diện đẹp và chạy rất mượt!"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "sentiment_analyzer",
+            "args": {
+              "text": "Tính năng AI này thật tuyệt vời, giao diện đẹp và chạy rất mượt!"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "missing_info",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "sentiment_analyzer",
+          "args": {
+            "text": "Tính năng AI này thật tuyệt vời, giao diện đẹp và chạy rất mượt!"
+          },
+          "result": {
+            "tool": "sentiment_analyzer",
+            "status": "ok",
+            "sentiment": "positive",
+            "score": 1.0,
+            "details": {
+              "positive_keywords": [
+                "tuyệt",
+                "đẹp"
+              ],
+              "negative_keywords": [],
+              "word_count": 14
+            },
+            "summary": "Văn bản có sắc thái positive (score: 1.0)."
+          }
+        }
+      ]
+    }
+  ]
+}

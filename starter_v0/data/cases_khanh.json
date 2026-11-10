@@ -43,8 +43,14 @@
       "id": "GRP_K03_youtube_short_link_multiturn",
       "phase": "B",
       "turns": [
-        "Tôi vừa xem một video bài giảng về Attention Mechanism nhưng không kịp ghi chép.",
-        "Link video ngắn đây nhé: https://youtu.be/mMa2PmYJlCo"
+        {
+          "role": "user",
+          "content": "Tôi vừa xem một video bài giảng về Attention Mechanism nhưng không kịp ghi chép."
+        },
+        {
+          "role": "user",
+          "content": "Link video ngắn đây nhé: https://youtu.be/mMa2PmYJlCo"
+        }
       ],
       "failure_type": "missing_info",
       "expect": {

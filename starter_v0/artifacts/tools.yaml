@@ -16,12 +16,12 @@
 tools:
   # ---------------- Core tools ----------------
   - name: clarify
-    description: "Gửi một câu hỏi cho người dùng."
+    description: "Hỏi lại người dùng rồi dừng chờ trả lời. DÙNG KHI: (1) thiếu thông tin bắt buộc để gọi tool khác (tweet của ai, URL nào) -> response_type='text'; (2) trước khi thực hiện hành động ghi/gửi như send -> response_type='yes_no' để xin xác nhận. Với yêu cầu gửi/đăng chưa được xác nhận, LUÔN hỏi yes_no, kể cả khi nội dung còn thiếu (xác nhận nội dung và nơi gửi). KHÔNG dùng khi đã đủ thông tin để gọi tool khác."
     parameters:
       type: object
       properties:
         question: {type: string, default: "", description: "Câu hỏi"}
-        response_type: {type: string, enum: [text, yes_no, choice], default: "text", description: "Kiểu trả lời"}
+        response_type: {type: string, enum: [text, yes_no, choice], default: "text", description: "'text' hỏi thông tin còn thiếu; 'yes_no' xin xác nhận trước khi gửi/đăng; 'choice' chọn một trong options."}
         options: {type: array, default: [], items: {type: string}, description: "Các lựa chọn"}
       required: [question]
 
@@ -45,22 +45,22 @@ tools:
       required: [query]
 
   - name: lookup
-    description: "Tra cứu thông tin trên internet."
+    description: "Tìm tin tức, sự kiện, tài liệu trên web. DÙNG KHI người dùng hỏi tin tức/sự kiện/thông tin trên web, hoặc nói rõ 'tìm trên web', 'chuyển sang web'. Hỏi tin mới thì đặt topic='news'. KHÔNG dùng để lấy tweet (dùng timeline hoặc social_search), đọc một URL cụ thể (dùng fetch), hay tính toán (dùng calculator)."
     parameters:
       type: object
       properties:
-        query: {type: string, default: "", description: "Truy vấn"}
-        topic: {type: string, enum: [general, news], default: "general", description: "Phân loại"}
-        timeframe: {type: string, enum: [day, week, month, year], default: "week", description: "Khoảng thời gian"}
+        query: {type: string, default: "", description: "Từ khóa NGẮN chỉ nêu chủ đề (ví dụ 'AI', 'OpenAI'). KHÔNG thêm các từ như 'news', 'tin tức', 'mới nhất' vào query; dùng topic và timeframe cho việc đó."}
+        topic: {type: string, enum: [general, news], default: "general", description: "'news' khi hỏi tin tức/sự kiện mới; 'general' cho kiến thức chung."}
+        timeframe: {type: string, enum: [day, week, month, year], default: "week", description: "'day' cho 'hôm nay', 'week' cho 'tuần này', 'month', 'year'. Chỉ đặt khi người dùng nêu mốc thời gian."}
         max_results: {type: integer, default: 5, description: "Số kết quả"}
       required: [query]
 
   - name: fetch
-    description: "Lấy nội dung từ một địa chỉ."
+    description: "Đọc nội dung một trang web/bài viết từ URL CỤ THỂ mà người dùng đã cung cấp. KHÔNG dùng khi chưa có URL (hãy hỏi lại bằng clarify, đừng đoán URL) và không dùng cho video YouTube (dùng youtube_transcript)."
     parameters:
       type: object
       properties:
-        url: {type: string, default: "", description: "Địa chỉ"}
+        url: {type: string, default: "", description: "URL đầy đủ do người dùng cung cấp; không tự đoán."}
       required: [url]
 
   - name: format
@@ -86,12 +86,12 @@ tools:
 
   # ---------------- Bonus tools ----------------
   - name: send
-    description: "Gửi một đoạn văn bản đi."
+    description: "Gửi văn bản qua Telegram - hành động KHÔNG hoàn tác. CHỈ gọi sau khi đã dùng clarify (yes_no) và người dùng đồng ý rõ ràng ở lượt sau; khi đó đặt confirmed=true. Chưa được xác nhận thì KHÔNG gọi send. KHÔNG dùng send để trả lời người dùng."
     parameters:
       type: object
       properties:
         text: {type: string, default: "", description: "Nội dung"}
-        confirmed: {type: boolean, default: false, description: "Cờ xác nhận"}
+        confirmed: {type: boolean, default: false, description: "true CHỈ khi người dùng đã đồng ý rõ ràng việc gửi."}
       required: [text]
 
   - name: policy
